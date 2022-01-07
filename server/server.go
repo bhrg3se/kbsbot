@@ -19,7 +19,7 @@ func StartServer() {
 	flag.Parse()
 
 	// parse config file
-	config := parseConfig("/etc/kbsbot/")
+	config := parseConfig("~/")
 
 	//set log level
 	level, err := logrus.ParseLevel(config.Logging.Level)
