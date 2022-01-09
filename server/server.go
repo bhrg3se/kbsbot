@@ -19,7 +19,7 @@ func StartServer() {
 	flag.Parse()
 
 	// parse config file
-	config := parseConfig("~/")
+	config := parseConfig("")
 
 	//set log level
 	level, err := logrus.ParseLevel(config.Logging.Level)
@@ -72,18 +72,16 @@ func StartServer() {
 // parseConfig uses viper to parse config file.
 func parseConfig(path string) models.Config {
 	var config models.Config
-	absPath, err := filepath.Abs(path)
-	if err != nil {
-		panic("config file not found in " + filepath.Join(path))
-	}
+	absPath, _ := filepath.Abs(path)
 
+	viper.AutomaticEnv()
 	viper.SetConfigName("config")
 	viper.AddConfigPath(absPath)
 
-	if err = viper.ReadInConfig(); err != nil {
+	if err := viper.ReadInConfig(); err != nil {
 		logrus.Fatalf("could not read config file: %v", err)
 	}
-	err = viper.Unmarshal(&config)
+	err := viper.Unmarshal(&config)
 	if err != nil {
 		logrus.Fatalf("config file invalid: %v", err)
 	}
