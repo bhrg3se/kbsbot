@@ -7,10 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"kbsbot/handlers"
-	"kbsbot/models"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"syscall"
 )
 
@@ -18,11 +16,13 @@ func StartServer() {
 	writeToFile := flag.Bool("f", false, "write logs to file")
 	flag.Parse()
 
-	// parse config file
-	config := parseConfig("")
+	// parse config
+	viper.AutomaticEnv()
+	viper.AllowEmptyEnv(true)
+	viper.SetEnvPrefix("KBS")
 
 	//set log level
-	level, err := logrus.ParseLevel(config.Logging.Level)
+	level, err := logrus.ParseLevel(viper.GetString("Logging.Level"))
 	if err != nil {
 		level = logrus.ErrorLevel
 	}
@@ -41,8 +41,7 @@ func StartServer() {
 	// create database connections and other dependencies
 	//store.State = store.NewRealStore(config)
 
-	fmt.Println(config)
-	dg, err := discordgo.New("Bot " + config.Bot.APIToken)
+	dg, err := discordgo.New("Bot " + viper.GetString("Bot.APIToken"))
 	if err != nil {
 		logrus.Fatal(err)
 	}
@@ -67,24 +66,4 @@ func StartServer() {
 
 	// Cleanly close down the Discord session.
 	dg.Close()
-}
-
-// parseConfig uses viper to parse config file.
-func parseConfig(path string) models.Config {
-	var config models.Config
-	absPath, _ := filepath.Abs(path)
-
-	viper.AutomaticEnv()
-	viper.SetConfigName("config")
-	viper.AddConfigPath(absPath)
-
-	if err := viper.ReadInConfig(); err != nil {
-		logrus.Fatalf("could not read config file: %v", err)
-	}
-	err := viper.Unmarshal(&config)
-	if err != nil {
-		logrus.Fatalf("config file invalid: %v", err)
-	}
-
-	return config
 }

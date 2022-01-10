@@ -22,8 +22,8 @@ type Config struct {
 	} `toml:"logging"`
 
 	Bot struct {
-		APIToken string `toml:"apiToken"`
-	} `toml:"bot"`
+		APIToken string
+	}
 }
 
 type JWTToken struct {
