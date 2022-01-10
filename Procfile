@@ -1,1 +1,1 @@
-worker: bin/kbsbot
+worker: /app/bin/kbsbot
