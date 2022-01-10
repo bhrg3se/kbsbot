@@ -11,7 +11,10 @@ import (
 )
 
 func GetColonistProfile(ctx *exrouter.Context) {
-	username := ctx.Args[1]
+	var username = ""
+	if len(ctx.Args) > 1 {
+		username = ctx.Args[1]
+	}
 	if strings.TrimSpace(username) == "" {
 		username = ctx.Msg.Author.Username
 	}
