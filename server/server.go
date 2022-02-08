@@ -2,14 +2,14 @@ package server
 
 import (
 	"flag"
-	"fmt"
 	"github.com/bwmarrin/discordgo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"kbsbot/handlers"
+	"kbsbot/models"
+	"kbsbot/store"
+	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 )
 
 func StartServer() {
@@ -39,31 +39,15 @@ func StartServer() {
 	}
 
 	// create database connections and other dependencies
-	//store.State = store.NewRealStore(config)
+	store.State = store.NewRealStore(models.Config{})
 
-	dg, err := discordgo.New("Bot " + viper.GetString("Bot.APIToken"))
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
+	dg := store.State.GetDiscordSession()
 	handlers.AddRoutes(dg)
 
 	// In this example, we only care about receiving message events.
 	dg.Identify.Intents = discordgo.IntentsGuildMessages
 
-	// Open a websocket connection to Discord and begin listening.
-	err = dg.Open()
-	if err != nil {
-		fmt.Println("error opening connection,", err)
-		return
-	}
+	http.HandleFunc("/api/ring", handlers.Ring)
+	http.ListenAndServe("0.0.0.0:3333", http.DefaultServeMux)
 
-	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
-	sc := make(chan os.Signal, 1)
-	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
-	<-sc
-
-	// Cleanly close down the Discord session.
-	dg.Close()
 }

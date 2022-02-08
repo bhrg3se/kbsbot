@@ -3,7 +3,6 @@ package handlers
 import (
 	"github.com/Necroforger/dgrouter/exrouter"
 	"github.com/bwmarrin/discordgo"
-	"kbsbot/handlers/catan"
 	"strings"
 )
 
@@ -13,7 +12,7 @@ func AddRoutes(s *discordgo.Session) {
 	router := exrouter.New()
 
 	router.On("greet", Greet)
-	router.On("check", catan.GetColonistProfile)
+	router.On("check", GetColonistProfile)
 
 	// Match the regular expression user(name)?
 	//router.OnMatch("username", dgrouter.NewRegexMatcher("/^(hello)/i"), func(ctx *exrouter.Context) {

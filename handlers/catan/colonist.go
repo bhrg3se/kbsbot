@@ -3,36 +3,11 @@ package catan
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/Necroforger/dgrouter/exrouter"
-	"github.com/sirupsen/logrus"
 	"log"
 	"net/http"
-	"strings"
 )
 
-func GetColonistProfile(ctx *exrouter.Context) {
-	var username = ""
-	if len(ctx.Args) > 1 {
-		username = ctx.Args[1]
-	}
-	if strings.TrimSpace(username) == "" {
-		username = ctx.Msg.Author.Username
-	}
-	profile, err := getProfile(username)
-	if err != nil {
-		logrus.Error(err)
-		ctx.Reply("Sorry! Something is wrong. \n Maybe the username is incorrect?")
-		return
-	}
-	ctx.Reply(fmt.Sprintf("Username: %s\nKarma: %s\nTotal Games: %d \nWins Percent: %s",
-		profile.Username,
-		profile.Karma,
-		profile.TotalGames,
-		profile.WinPercent,
-	))
-}
-
-func getProfile(username string) (*respStruct, error) {
+func GetProfile(username string) (*respStruct, error) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://colonist.io/api/profile/"+username, nil)
 	if err != nil {
